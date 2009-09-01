@@ -320,6 +320,10 @@ module ::JdbcSpec
       name.to_s =~ /^[a-z0-9_$#]+$/ ? name.to_s : "\"#{name}\""
     end
 
+    def quote_table_name(name) #:nodoc:
+      name.to_s
+    end
+
     def quote_string(string) #:nodoc:
       string.gsub(/'/, "''")
     end
