@@ -1,5 +1,21 @@
+require 'rubygems'
 require 'rake'
 require 'rake/testtask'
+
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |gem|
+    gem.name = "activerecord-jdbc-adapter"
+    gem.summary = %Q{JDBC adapter for ActiveRecord, for use within JRuby on Rails.}
+    gem.description = %Q{JDBC adapter for ActiveRecord, for use within JRuby on Rails.}
+    gem.email = "nick@nicksieger.com, ola.bini@gmail.com"
+    gem.homepage = "http://github.com/saturnflyer/activerecord-jdbc-adapter"
+    gem.authors = ["Nick Sieger", "Ola Bini", "JRuby contributors"]
+    # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
+  end
+rescue LoadError
+  puts "Jeweler (or a dependency) not available. Install it with: sudo gem install jeweler"
+end
 
 task :default => [:java_compile, :test]
 
@@ -110,22 +126,22 @@ end
 Rake::Task['manifest'].invoke # Always regen manifest, so Hoe has up-to-date list of files
 
 require File.dirname(__FILE__) + "/lib/jdbc_adapter/version"
-begin
-  require 'hoe'
-  Hoe.new("activerecord-jdbc-adapter", JdbcAdapter::Version::VERSION) do |p|
-    p.rubyforge_name = "jruby-extras"
-    p.url = "http://jruby-extras.rubyforge.org/activerecord-jdbc-adapter"
-    p.author = "Nick Sieger, Ola Bini and JRuby contributors"
-    p.email = "nick@nicksieger.com, ola.bini@gmail.com"
-    p.summary = "JDBC adapter for ActiveRecord, for use within JRuby on Rails."
-    p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
-    p.description = p.paragraphs_of('README.txt', 0...1).join("\n\n")
-  end.spec.dependencies.delete_if { |dep| dep.name == "hoe" }
-rescue LoadError
-  puts "You really need Hoe installed to be able to package this gem"
-rescue => e
-  puts "ignoring error while loading hoe: #{e.to_s}"
-end
+# begin
+#   require 'hoe'
+#   Hoe.new("activerecord-jdbc-adapter", JdbcAdapter::Version::VERSION) do |p|
+#     p.rubyforge_name = "jruby-extras"
+#     p.url = "http://jruby-extras.rubyforge.org/activerecord-jdbc-adapter"
+#     p.author = "Nick Sieger, Ola Bini and JRuby contributors"
+#     p.email = "nick@nicksieger.com, ola.bini@gmail.com"
+#     p.summary = "JDBC adapter for ActiveRecord, for use within JRuby on Rails."
+#     p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
+#     p.description = p.paragraphs_of('README.txt', 0...1).join("\n\n")
+#   end.spec.dependencies.delete_if { |dep| dep.name == "hoe" }
+# rescue LoadError
+#   puts "You really need Hoe installed to be able to package this gem"
+# rescue => e
+#   puts "ignoring error while loading hoe: #{e.to_s}"
+# end
 
 def rake(*args)
   ruby "-S", "rake", *args
@@ -175,3 +191,17 @@ end
 
 require 'rake/clean'
 CLEAN.include 'derby*', 'test.db.*','test/reports', 'test.sqlite3','lib/**/*.jar','manifest.mf', '*.log'
+
+require 'rake/rdoctask'
+Rake::RDocTask.new do |rdoc|
+  if File.exist?('VERSION')
+    version = File.read('VERSION')
+  else
+    version = ""
+  end
+
+  rdoc.rdoc_dir = 'rdoc'
+  rdoc.title = "activerecord-jdbc-adapter #{version}"
+  rdoc.rdoc_files.include('README*')
+  rdoc.rdoc_files.include('lib/**/*.rb')
+end
