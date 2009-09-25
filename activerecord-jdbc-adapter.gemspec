@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{activerecord-jdbc-adapter}
-  s.version = "0.9.2"
+  s.version = "0.9.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Sieger", "Ola Bini", "JRuby contributors"]
-  s.date = %q{2009-09-24}
+  s.date = %q{2009-09-25}
   s.description = %q{JDBC adapter for ActiveRecord, for use within JRuby on Rails.}
   s.email = %q{nick@nicksieger.com, ola.bini@gmail.com}
   s.extra_rdoc_files = [
@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
      "README.txt",
      "Rakefile",
      "VERSION",
+     "activerecord-jdbc-adapter.gemspec",
      "adapters/derby/LICENSE.txt",
      "adapters/derby/README.txt",
      "adapters/derby/Rakefile",
@@ -63,7 +64,7 @@ Gem::Specification.new do |s|
      "drivers/derby/LICENSE.txt",
      "drivers/derby/README.txt",
      "drivers/derby/Rakefile",
-     "drivers/derby/lib/derby-10.4.2.0.jar",
+     "drivers/derby/lib/derby-10.5.3.0.jar",
      "drivers/derby/lib/jdbc/derby.rb",
      "drivers/h2/History.txt",
      "drivers/h2/LICENSE.txt",
@@ -127,6 +128,9 @@ Gem::Specification.new do |s|
      "lib/jdbc_adapter/tsql_helper.rb",
      "lib/jdbc_adapter/version.rb",
      "pom.xml",
+     "rakelib/compile.rake",
+     "rakelib/package.rake",
+     "rakelib/rails.rake",
      "src/java/jdbc_adapter/JdbcAdapterInternalService.java",
      "src/java/jdbc_adapter/JdbcConnectionFactory.java",
      "src/java/jdbc_adapter/JdbcDerbySpec.java",
@@ -185,9 +189,11 @@ Gem::Specification.new do |s|
      "test/models/reserved_word.rb",
      "test/mssql_simple_test.rb",
      "test/mysql_multibyte_test.rb",
+     "test/mysql_nonstandard_primary_key_test.rb",
      "test/mysql_simple_test.rb",
      "test/oracle_simple_test.rb",
      "test/postgres_mixed_case_test.rb",
+     "test/postgres_nonseq_pkey_test.rb",
      "test/postgres_reserved_test.rb",
      "test/postgres_simple_test.rb",
      "test/simple.rb",
@@ -197,12 +203,38 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/saturnflyer/activerecord-jdbc-adapter}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.5}
+  s.rubygems_version = %q{1.3.3}
   s.summary = %q{JDBC adapter for ActiveRecord, for use within JRuby on Rails.}
   s.test_files = [
-    "test/activerecord/connection_adapters/type_conversion_test.rb",
+    "test/cachedb_simple_test.rb",
+     "test/db2_simple_test.rb",
+     "test/derby_migration_test.rb",
+     "test/derby_multibyte_test.rb",
+     "test/derby_simple_test.rb",
+     "test/generic_jdbc_connection_test.rb",
+     "test/h2_simple_test.rb",
+     "test/has_many_through.rb",
+     "test/hsqldb_simple_test.rb",
+     "test/informix_simple_test.rb",
+     "test/jdbc_common.rb",
+     "test/jndi_callbacks_test.rb",
+     "test/jndi_test.rb",
+     "test/manualTestDatabase.rb",
+     "test/minirunit.rb",
+     "test/mssql_simple_test.rb",
+     "test/mysql_multibyte_test.rb",
+     "test/mysql_nonstandard_primary_key_test.rb",
+     "test/mysql_simple_test.rb",
+     "test/oracle_simple_test.rb",
+     "test/postgres_mixed_case_test.rb",
+     "test/postgres_nonseq_pkey_test.rb",
+     "test/postgres_reserved_test.rb",
+     "test/postgres_simple_test.rb",
+     "test/simple.rb",
+     "test/sqlite3_simple_test.rb",
+     "test/sybase_jtds_simple_test.rb",
+     "test/activerecord/connection_adapters/type_conversion_test.rb",
      "test/activerecord/connections/native_jdbc_mysql/connection.rb",
-     "test/cachedb_simple_test.rb",
      "test/db/cachedb.rb",
      "test/db/db2.rb",
      "test/db/derby.rb",
@@ -217,44 +249,20 @@ Gem::Specification.new do |s|
      "test/db/oracle.rb",
      "test/db/postgres.rb",
      "test/db/sqlite3.rb",
-     "test/db2_simple_test.rb",
-     "test/derby_migration_test.rb",
-     "test/derby_multibyte_test.rb",
-     "test/derby_simple_test.rb",
-     "test/generic_jdbc_connection_test.rb",
-     "test/h2_simple_test.rb",
-     "test/has_many_through.rb",
-     "test/hsqldb_simple_test.rb",
-     "test/informix_simple_test.rb",
      "test/jdbc_adapter/jdbc_db2_test.rb",
      "test/jdbc_adapter/jdbc_sybase_test.rb",
-     "test/jdbc_common.rb",
-     "test/jndi_callbacks_test.rb",
-     "test/jndi_test.rb",
-     "test/manualTestDatabase.rb",
      "test/minirunit/testConnect.rb",
      "test/minirunit/testH2.rb",
      "test/minirunit/testHsqldb.rb",
      "test/minirunit/testLoadActiveRecord.rb",
      "test/minirunit/testMysql.rb",
      "test/minirunit/testRawSelect.rb",
-     "test/minirunit.rb",
      "test/models/add_not_null_column_to_table.rb",
      "test/models/auto_id.rb",
      "test/models/data_types.rb",
      "test/models/entry.rb",
      "test/models/mixed_case.rb",
-     "test/models/reserved_word.rb",
-     "test/mssql_simple_test.rb",
-     "test/mysql_multibyte_test.rb",
-     "test/mysql_simple_test.rb",
-     "test/oracle_simple_test.rb",
-     "test/postgres_mixed_case_test.rb",
-     "test/postgres_reserved_test.rb",
-     "test/postgres_simple_test.rb",
-     "test/simple.rb",
-     "test/sqlite3_simple_test.rb",
-     "test/sybase_jtds_simple_test.rb"
+     "test/models/reserved_word.rb"
   ]
 
   if s.respond_to? :specification_version then
