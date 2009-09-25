@@ -71,7 +71,7 @@ module ::JdbcSpec
         when /char/i                           : :string
         when /float|double/i                   : :float
         when /int/i                            : :integer
-        when /num|dec|real/i                   : @scale == 0 ? :integer : :decimal
+        when /num|dec|real/i                   : (@scale.nil? || @scale == 0) ? :integer : :decimal
         when /date|time/i                      : :datetime
         when /clob/i                           : :text
         when /blob/i                           : :binary
@@ -86,6 +86,9 @@ module ::JdbcSpec
         value = value.strip
 
         return nil if value == "null"
+        
+        # sysdate default should be treated like a null value
+        return nil if value.downcase == "sysdate"
 
         # jdbc returns column default strings with actual single quotes around the value.
         return $1 if value =~ /^'(.*)'$/
