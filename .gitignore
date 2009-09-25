@@ -14,3 +14,4 @@ TAGS
 patches*
 *#
 .stgit-edit.txt
+target/
