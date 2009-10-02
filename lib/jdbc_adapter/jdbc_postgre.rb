@@ -4,7 +4,10 @@ module ::JdbcSpec
   $LOADED_FEATURES << "active_record/connection_adapters/postgresql_adapter.rb"
 
   module ActiveRecordExtensions
+    add_method_to_remove_from_ar_base(:postgresql_connection)
+
     def postgresql_connection(config)
+      require File.dirname(__FILE__) + "/../active_record/connection_adapters/postgresql_adapter"
       config[:host] ||= "localhost"
       config[:port] ||= 5432
       config[:url] ||= "jdbc:postgresql://#{config[:host]}:#{config[:port]}/#{config[:database]}"
@@ -453,6 +456,13 @@ module ::JdbcSpec
 
     def change_column_default(table_name, column_name, default) #:nodoc:
       execute "ALTER TABLE #{quote_table_name(table_name)} ALTER COLUMN #{quote_column_name(column_name)} SET DEFAULT '#{default}'"
+    end
+
+    def change_column_null(table_name, column_name, null, default = nil)
+      unless null || default.nil?
+        execute("UPDATE #{quote_table_name(table_name)} SET #{quote_column_name(column_name)}=#{quote(default)} WHERE #{quote_column_name(column_name)} IS NULL")
+      end
+      execute("ALTER TABLE #{quote_table_name(table_name)} ALTER #{quote_column_name(column_name)} #{null ? 'DROP' : 'SET'} NOT NULL")
     end
 
     def rename_column(table_name, column_name, new_column_name) #:nodoc:

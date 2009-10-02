@@ -5,7 +5,10 @@ module ::JdbcSpec
   $LOADED_FEATURES << "active_record/connection_adapters/mysql_adapter.rb"
 
   module ActiveRecordExtensions
+    add_method_to_remove_from_ar_base(:mysql_connection)
+
     def mysql_connection(config)
+      require File.dirname(__FILE__) + "/../active_record/connection_adapters/mysql_adapter"
       config[:port] ||= 3306
       url_options = "zeroDateTimeBehavior=convertToNull&jdbcCompliantTruncation=false&useUnicode=true&characterEncoding="
       url_options << (config[:encoding] || 'utf8')

@@ -1,6 +1,13 @@
 module ::JdbcSpec
+  # Don't need to load native postgres adapter
+  $LOADED_FEATURES << "active_record/connection_adapters/sqlite3_adapter.rb"
+
   module ActiveRecordExtensions
+    add_method_to_remove_from_ar_base(:sqlite3_connection)
+
     def sqlite3_connection(config)
+      require File.dirname(__FILE__) + "/../active_record/connection_adapters/sqlite3_adapter"
+
       parse_sqlite3_config!(config)
 
       config[:url] ||= "jdbc:sqlite:#{config[:database]}"
@@ -69,7 +76,8 @@ module ::JdbcSpec
       def simplified_type(field_type)
         case field_type
         when /boolean/i                        then :boolean
-        when /text/i                           then :string
+        when /text/i                           then :text
+        when /varchar/i                        then :string
         when /int/i                            then :integer
         when /float/i                          then :float
         when /real/i                           then @scale == 0 ? :integer : :decimal
@@ -144,7 +152,8 @@ module ::JdbcSpec
     end
 
     def modify_types(tp)
-      tp[:primary_key] = "INTEGER PRIMARY KEY AUTOINCREMENT"
+      tp[:primary_key] = "INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"
+      tp[:string] = { :name => "VARCHAR", :limit => 255 }
       tp[:float] = { :name => "REAL" }
       tp[:decimal] = { :name => "REAL" }
       tp[:datetime] = { :name => "DATETIME" }
@@ -161,7 +170,9 @@ module ::JdbcSpec
       when String
         if column && column.type == :binary
           "'#{quote_string(column.class.string_to_binary(value))}'"
-        elsif column.respond_to?(:primary) && column.primary
+        elsif column && [:integer, :float].include?(column.type)
+          (column.type == :integer ? value.to_i : value.to_f).to_s
+        elsif column && column.respond_to?(:primary) && column.primary
           value.to_i.to_s
         else
           "'#{quote_string(value)}'"
@@ -263,8 +274,16 @@ module ::JdbcSpec
       end
     end
 
-    def tables
-      @connection.tables.select {|row| row.to_s !~ /^sqlite_/i }
+    def tables(name = nil) #:nodoc:
+      sql = <<-SQL
+        SELECT name
+        FROM sqlite_master
+        WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+      SQL
+
+      select_rows(sql, name).map do |row|
+        row[0]
+      end
     end
 
     def remove_index(table_name, options = {})

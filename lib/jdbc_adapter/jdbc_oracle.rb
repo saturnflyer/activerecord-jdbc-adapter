@@ -26,6 +26,9 @@ module ::JdbcSpec
         ActiveRecord::Base.after_save :after_save_with_oracle_lob
         @lob_callback_added = true
       end
+      mod.class_eval do
+        alias_chained_method :insert, :query_dirty, :jdbc_oracle_insert
+      end
     end
 
     def self.adapter_matcher(name, *)
@@ -71,7 +74,7 @@ module ::JdbcSpec
         when /char/i                           then :string
         when /float|double/i                   then :float
         when /int/i                            then :integer
-        when /num|dec|real/i                   then (@scale.nil? || @scale == 0) ? :integer : :decimal
+        when /num|dec|real/i                   then @scale == 0 ? :integer : :decimal
         when /date|time/i                      then :datetime
         when /clob/i                           then :text
         when /blob/i                           then :binary
@@ -87,6 +90,9 @@ module ::JdbcSpec
 
         return nil if value == "null"
         
+        # sysdate default should be treated like a null value
+        return nil if value.downcase == "sysdate"
+
         # sysdate default should be treated like a null value
         return nil if value.downcase == "sysdate"
 
@@ -135,8 +141,8 @@ module ::JdbcSpec
       recreate_database(name)
     end
 
-    def insert(sql, name = nil, pk = nil, id_value = nil, sequence_name = nil) #:nodoc:
-      if id_value # Pre-assigned id
+    def jdbc_oracle_insert(sql, name = nil, pk = nil, id_value = nil, sequence_name = nil) #:nodoc:
+      if id_value || pk.nil? # Pre-assigned id or table without a primary key
         execute sql, name
       else # Assume the sql contains a bind-variable for the id
         # Extract the table from the insert sql. Yuck.
